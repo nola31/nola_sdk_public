@@ -1,5 +1,3 @@
-# nola_agent_sdk – базовая структура агента с мышлением
-
 from flask import Flask, request, jsonify
 import os
 import datetime
@@ -7,7 +5,6 @@ import openai
 
 app = Flask(__name__)
 
-# Создание папки
 @app.route("/create_folder", methods=["POST"])
 def create_folder():
     data = request.json
@@ -20,12 +17,10 @@ def create_folder():
     else:
         return jsonify({"status": "exists", "message": f"Folder '{folder_name}' already exists."})
 
-# Статус
 @app.route("/status", methods=["GET"])
 def status():
     return jsonify({"status": "alive", "time": datetime.datetime.now().isoformat()})
 
-# Команда
 @app.route("/command", methods=["POST"])
 def command():
     data = request.json
@@ -33,14 +28,12 @@ def command():
     response = f"Команда получена: {cmd}"
     return jsonify({"response": response})
 
-# Мышление через OpenAI
 @app.route("/think", methods=["POST"])
 def think():
     data = request.json
     prompt = data.get("prompt", "Пусто")
 
-    # ВСТАВЬ СЮДА СВОЙ КЛЮЧ
-    openai.api_key = "sk-...."  # замени на свой актуальный ключ
+    openai.api_key = "sk-..."  # Вставь свой ключ
 
     try:
         response = openai.ChatCompletion.create(
@@ -53,6 +46,5 @@ def think():
         print("Ошибка мышления:", e)
         return jsonify({"error": str(e)})
 
-# Запуск
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
