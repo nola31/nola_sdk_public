@@ -24,16 +24,16 @@ def status():
 @app.route("/command", methods=["POST"])
 def command():
     data = request.json
-    cmd = data.get("command", "(пусто)")
-    response = f"Команда получена: {cmd}"
+    cmd = data.get("command", "(РїСѓСЃС‚Рѕ)")
+    response = f"РљРѕРјР°РЅРґР° РїРѕР»СѓС‡РµРЅР°: {cmd}"
     return jsonify({"response": response})
 
 @app.route("/think", methods=["POST"])
 def think():
     data = request.json
-    prompt = data.get("prompt", "Пусто")
+    prompt = data.get("prompt", "РџСѓСЃС‚Рѕ")
 
-    openai.api_key = "sk-..."  # Вставь свой ключ
+    openai.api_key = "sk-..."  # Р’СЃС‚Р°РІСЊ СЃРІРѕР№ РєР»СЋС‡
 
     try:
         response = openai.ChatCompletion.create(
@@ -43,7 +43,7 @@ def think():
         reply = response['choices'][0]['message']['content']
         return jsonify({"response": reply})
     except Exception as e:
-        print("Ошибка мышления:", e)
+        print("РћС€РёР±РєР° РјС‹С€Р»РµРЅРёСЏ:", e)
         return jsonify({"error": str(e)})
 
 if __name__ == "__main__":
