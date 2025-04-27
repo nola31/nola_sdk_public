@@ -1,50 +1,37 @@
-from flask import Flask, request, jsonify
-import os
-import datetime
 import openai
+import os
+from dotenv import load_dotenv
+from flask import Flask, request, jsonify
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
+
+# Подключаем ключ OpenAI из окружения
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
 
-@app.route("/create_folder", methods=["POST"])
-def create_folder():
-    data = request.json
-    folder_name = data.get("folder_name", "nola")
-    path = os.path.join(os.getcwd(), folder_name)
-
-    if not os.path.exists(path):
-        os.makedirs(path)
-        return jsonify({"status": "success", "message": f"Folder '{folder_name}' created."})
-    else:
-        return jsonify({"status": "exists", "message": f"Folder '{folder_name}' already exists."})
-
-@app.route("/status", methods=["GET"])
-def status():
-    return jsonify({"status": "alive", "time": datetime.datetime.now().isoformat()})
-
 @app.route("/command", methods=["POST"])
 def command():
-    data = request.json
-    cmd = data.get("command", "(пусто)")
-    response = f"Команда получена: {cmd}"
-    return jsonify({"response": response})
+    data = request.get_json()
+    cmd = data.get("command", "")
+    return jsonify({"response": f"say hello: {cmd}"})
 
 @app.route("/think", methods=["POST"])
 def think():
-    data = request.json
-    prompt = data.get("prompt", "Пусто")
-
-    openai.api_key = "sk-..."  # Вставь свой ключ
+    data = request.get_json()
+    prompt = data.get("prompt", "")
 
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}]
+        completion = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=prompt,
+            max_tokens=100
         )
-        reply = response['choices'][0]['message']['content']
-        return jsonify({"response": reply})
+        response_text = completion.choices[0].text.strip()
+        return jsonify({"response": response_text})
     except Exception as e:
-        print("Ошибка мышления:", e)
-        return jsonify({"error": str(e)})
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
