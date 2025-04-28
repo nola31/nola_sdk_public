@@ -1,15 +1,13 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
-from openai import OpenAI
+import openai
 
 # Загружаем переменные окружения из .env файла
 load_dotenv()
 
-# Инициализируем клиента OpenAI
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+# Подключаем ключ OpenAI из окружения
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
 
@@ -19,19 +17,18 @@ def command():
     cmd = data.get("command", "")
     return jsonify({"response": f"say hello: {cmd}"})
 
-
 @app.route("/think", methods=["POST"])
 def think():
     data = request.get_json()
     prompt = data.get("prompt", "")
 
     try:
-        response = client.completions.create(
-            model="text-davinci-003",
-            prompt=prompt,
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
             max_tokens=100
         )
-        response_text = response.choices[0].text.strip()
+        response_text = response.choices[0].message.content.strip()
         return jsonify({"response": response_text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
