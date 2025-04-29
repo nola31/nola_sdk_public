@@ -10,7 +10,7 @@ class NolaPulse:
     def start(self):
         if not self.running:
             self.running = True
-            self.thread = threading.Thread(target=self._pulse_loop)
+            self.thread = threading.Thread(target=self._pulse_loop, daemon=True)
             self.thread.start()
 
     def stop(self):
@@ -23,13 +23,3 @@ class NolaPulse:
         while self.running:
             print("[Pulse] Прошел еще один интервал.")
             time.sleep(self.interval)
-
-# При запуске напрямую
-if __name__ == "__main__":
-    pulse = NolaPulse(interval_seconds=60)
-    pulse.start()
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        pulse.stop()
