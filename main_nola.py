@@ -7,14 +7,17 @@ from nola_pulse import NolaPulse
 # Загружаем переменные окружения из .env файла
 load_dotenv()
 
+# Создаём клиент OpenAI
 openai_client = openai.OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
 app = Flask(__name__)
 
-pulse = NolaPulse(interval_seconds=60)  # пульс: раз в 60 секунд
+# Запускаем пульс
+pulse = NolaPulse(interval_seconds=60)
 pulse.start()
+print("NolaPulse был запущен")
 
 @app.route("/command", methods=["POST"])
 def command():
@@ -37,6 +40,13 @@ def think():
         return jsonify({"response": response_text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/status", methods=["GET"])
+def status():
+    return jsonify({
+        "status": "alive",
+        "time": str(os.popen("date").read().strip())
+    })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
