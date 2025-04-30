@@ -1,30 +1,39 @@
-import openai
 import os
+import openai
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from nola_pulse import NolaPulse
+from nola_agent import NolaAgent
 
-# Загружаем переменные окружения из .env файла
+# Загружаем переменные окружения
 load_dotenv()
 
-# Создаём клиент OpenAI
+# Инициализируем клиента OpenAI
 openai_client = openai.OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
+# Flask-приложение
 app = Flask(__name__)
 
-# Запускаем пульс
+# Пульс Нолы
 pulse = NolaPulse(interval_seconds=60)
 pulse.start()
 print("NolaPulse был запущен")
 
+# Агент Нолы
+agent = NolaAgent()
+print("NolaAgent инициализирован")
+
+# Эндпоинт команд
 @app.route("/command", methods=["POST"])
 def command():
     data = request.get_json()
     cmd = data.get("command", "")
-    return jsonify({"response": f"say hello: {cmd}"})
+    response = agent.execute(cmd)
+    return jsonify({"response": response})
 
+# Эндпоинт мышления
 @app.route("/think", methods=["POST"])
 def think():
     data = request.get_json()
@@ -41,6 +50,7 @@ def think():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Статус
 @app.route("/status", methods=["GET"])
 def status():
     return jsonify({
