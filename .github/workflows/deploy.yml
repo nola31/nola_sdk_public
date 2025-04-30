@@ -11,18 +11,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Copy files to VPS and restart app
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        script: |
-          cd /путь/к/nola_sdk_public
-          git pull
-          source venv/bin/activate
-          pkill -f main_nola.py || true
-          nohup python3 main_nola.py > log.txt 2>&1 &
+      - name: Copy files to VPS and restart app
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /root/nola_sdk_public
+            git pull
+            source venv/bin/activate
+            pkill -f main_nola.py || true
+            nohup python3 main_nola.py > log.txt 2>&1 &
