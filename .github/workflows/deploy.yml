@@ -13,19 +13,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set decoded SSH key
-        id: decode_key
+      - name: Decode SSH key into file
         run: |
-          echo "key<<EOF" >> $GITHUB_OUTPUT
-          echo "${{ secrets.VPS_SSH_KEY_B64 }}" | base64 -d >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "${{ secrets.VPS_SSH_KEY_B64 }}" | base64 -d > key.pem
+          chmod 600 key.pem
 
-      - name: Deploy to VPS
+      - name: Connect to VPS and restart app
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ steps.decode_key.outputs.key }}
+          key_path: key.pem
           script: |
             cd /root/nola_sdk_public
             git pull
