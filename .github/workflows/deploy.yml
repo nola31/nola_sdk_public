@@ -8,7 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -18,7 +17,7 @@ jobs:
           echo "${{ secrets.VPS_SSH_KEY_B64 }}" | base64 -d > key.pem
           chmod 600 key.pem
           echo "=== KEY HEAD ==="
-          head -n 10 key.pem || echo "Key is empty!"
+          head -n 10 key.pem
           echo "=== END ==="
 
       - name: Connect to VPS and restart app
