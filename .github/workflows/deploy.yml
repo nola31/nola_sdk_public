@@ -23,6 +23,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key_path: key.pem
+          port: 22
           script: |
             cd /root/nola_sdk_public
             git pull
